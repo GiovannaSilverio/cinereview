@@ -9,9 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        'hero-pipoca': "url('/img/hero.jpg')",
+      },
+      colors:{
+        gray:"#1D1D1D",
+        lightgray:"#B5B5B5",
+        red:"#CC1914",
+        redhover:"#A41A16",
+        yellow:"#FCBD00",
+      },
+      fontFamily: {
+        heavitas: ['Heavitas'],
+        jura: ['Jura']
       },
     },
   },
