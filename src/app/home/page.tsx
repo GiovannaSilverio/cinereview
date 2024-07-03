@@ -1,7 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
@@ -9,11 +7,11 @@ import api from "@/services/api";
 
 interface RootObject {
   page: number;
-  results: Result[];
+  results: Movie[];
   total_pages: number;
   total_results: number;
 }
-interface Result {
+interface Movie {
   adult: boolean;
   backdrop_path: string;
   genre_ids: number[];
@@ -39,7 +37,9 @@ export default function Home() {
         const response = await api.get("/movies/page/1", {
           withCredentials: true, // para enviar o cookie
         });
-        console.log(response.status);
+
+        const data = response.data as RootObject;
+        console.log("Data:", data);
 
       } catch (error: any) {
         if (error.response && error.response.status === 403) {
