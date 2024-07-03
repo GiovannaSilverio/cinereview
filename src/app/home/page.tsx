@@ -36,7 +36,7 @@ export default function Home() {
   useEffect(() => {
     async function getMovies() {
       try {
-        const response = await api.get("/movies/page/2", {
+        const response = await api.get("/movies/page/1", {
           withCredentials: true, // para enviar o cookie
         });
         console.log(response.status);
