@@ -63,10 +63,10 @@ try{
   })
 
   const data = response.data as responseUser;
-  console.log("Data:", data);
+  // console.log("Data:", data);
 
   console.log("Response:", response.status);
-  console.log("Response:", response.data);
+  // console.log("Response:", response.data);
 
   if (response.status === 403) {
     console.error("Usuário não autenticado");
@@ -77,25 +77,16 @@ try{
 }
 
 
-catch (error) {
-  console.log("Erro na requisição:", error);
+catch (error: any) {
+  // console.log("Erro na requisição:", error);
+
+  if (error.response && error.response.status === 403) {
+    console.error("Usuário não autenticado");
+    redirect("/login");
+  }
 
 }
  
-  
-  // async function getUSer() {  
-  //   api.get(`/user/${decodedToken.user.id}`, {
-  //     withCredentials: true,
-  //   }).then((response) => {
-  //     console.log(response.data);
-  //     console.log(response.status);
-  //   }).catch((error) => {
-  //     console.log("Erro na requisição:", error);
-  //   });
-    
-  // }
-
-  // getUSer();
 
 
     return(

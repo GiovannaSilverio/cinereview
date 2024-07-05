@@ -41,6 +41,11 @@ export default function Home() {
         const data = response.data as RootObject;
         console.log("Data:", data);
 
+        if (response.status === 403) {
+          console.error("Usuário não autenticado");
+          router.push("/login");
+        }
+
       } catch (error: any) {
         if (error.response && error.response.status === 403) {
           console.error("Usuário não autenticado");
