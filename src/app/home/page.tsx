@@ -1,78 +1,143 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/services/api";
+import Image from "next/image";
+import ModalAvaliar from "@/components/ModalAvaliar";
 
 interface RootObject {
-  page: number;
-  results: Movie[];
-  total_pages: number;
-  total_results: number;
+    page: number;
+    results: Movie[];
+    total_pages: number;
+    total_results: number;
 }
 interface Movie {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
+    adult: boolean;
+    backdrop_path: string;
+    genre_ids: number[];
+    id: number;
+    original_language: string;
+    original_title: string;
+    overview: string;
+    popularity: number;
+    poster_path: string;
+    release_date: string;
+    title: string;
+    video: boolean;
+    vote_average: number;
+    vote_count: number;
 }
 
 export default function Home() {
-  const router = useRouter();
+    const [movies, setMovies] = useState<Movie[]>([]);
+    const router = useRouter();
 
-  useEffect(() => {
-    async function getMovies() {
-      try {
-        const response = await api.get("/movies/page/1", {
-          withCredentials: true, // para enviar o cookie
-        });
 
-        const data = response.data as RootObject;
-        console.log("Data:", data);
+    const [openModal, setOpenModal] = useState(false);
 
-      } catch (error: any) {
-        if (error.response && error.response.status === 403) {
-          console.error("Usuário não autenticado");
-          router.push("/login");
-   
-        } else {
-          console.error("Erro na requisição:", error);
-        }
-      }
+    const userid = window.localStorage.getItem("userId");
+    const accessToken = window.localStorage.getItem("accessToken");
+
+    if (!accessToken || !userid) {
+        console.error("Usuário não autenticado");
+        router.push("/login");
     }
 
-    getMovies();
-  }, []);
+    const config = {
+        headers: {
+            Authorization: "Bearer " + accessToken,
+        },
+    };
 
-  return (
-    <>
-      <Header />
-      <section className="bg-hero-pipoca w-full h-[710px] bg-no-repeat bg-cover flex flex-col justify-center items-center gap-28">
-        <h2 className="text-white text-center font-heavitas text-3xl">
-          Tenha organizado todas as <br />
-          suas resenhas do cinema
-        </h2>
-        <input
-          placeholder="Pesquise seu filme"
-          className="placeholder-black placeholder-opacity-50 bg-lightgray pl-4 w-1/2 py-2 rounded-md text-black"
-          type="text"
-        />
-      </section>
-      <section className="bg-black flex justify-center pt-14">
-        <h2 className="text-yellow text-xl font-heavitas">QUE TAL ASSISTIR?</h2>
-      </section>
-      <Footer />
-    </>
-  );
+    useEffect(() => {
+        async function getMovies() {
+            try {
+                const response = await api.get(
+                    `/movies/page/1`,
+                    config
+                );
+
+                const data = response.data as RootObject;
+                setMovies(data.results);
+                console.log("Data:", data);
+            } catch (error: any) {
+                if (error.response && error.response.status === 403) {
+                    console.error("Usuário não autenticado");
+                    router.push("/login");
+                } else {
+                    console.error("Erro na requisição:", error);
+                }
+            }
+        }
+
+        getMovies();
+    }, []);
+
+    return (
+        <>
+            <Header />
+            <div className="relative">
+                {openModal && (
+                    <div className="bg-[#0a2a50] w-full h-screen absolute bg-opacity-45 top-0 left-0 z-10" />
+                )}
+                <section className="bg-hero-pipoca w-full h-[710px] bg-no-repeat bg-cover flex flex-col justify-center items-center gap-28">
+                    <h2 className="text-white text-center font-heavitas text-3xl">
+                        Tenha organizado todas as <br />
+                        suas resenhas do cinema
+                    </h2>
+                    <div className=" flex items-center justify-between bg-lightgray px-4 w-1/2 py-2 rounded-md ">
+                        <input
+                            placeholder="Pesquise seu filme"
+                            className="placeholder-black flex-1 bg-lightgray placeholder-opacity-50 text-black focus:border-none focus:outline-none"
+                            type="text"
+                        />
+                        <button>
+                            <Image
+                                src="/img/search.png"
+                                alt="lupa"
+                                width={25}
+                                height={25}
+                            />
+                        </button>
+                    </div>
+                </section>
+                <section className="bg-black flex flex-col items-center justify-center gap-14 py-14">
+                    <h2 className="text-yellow text-3xl font-heavitas">
+                        QUE TAL ASSISTIR?
+                    </h2>
+                    <div className="grid grid-cols-4 gap-20">
+                    {movies.map((movie, index) => {
+                            if (!movie.adult) {
+                                return (
+                                    <div key={index} className="relative">
+                                        <div className="rounded-lg flex overflow-hidden hover:scale-110 justify-center items-center">
+                                            <button className="text-yellow font-bold text-2xl absolute z-20 font-jura text-center">Adicionar<br/>resenha</button>
+                                            <Image
+                                                className="object-cover"
+                                                alt="poster de filme"
+                                                src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+                                                width={238}
+                                                height={350}
+                                            />
+                                        </div>
+                                        <div className="absolute inset-0 z-10 bg-black opacity-0 hover:opacity-75 transition-opacity"></div>
+                                    </div>
+                                );
+                        
+                            }
+                        })}
+                    </div>
+                    {openModal && (
+                        <ModalAvaliar
+                            onCloseModal={(estado) => setOpenModal(estado)}
+                        />
+                    )}
+                </section>
+            </div>
+
+            <Footer />
+        </>
+    );
 }

@@ -38,6 +38,9 @@ export default function Login() {
       });
       if (response.status === 200) {
         alert("Login realizado com sucesso!");
+
+        window.localStorage.setItem('userId', response.data.userId)
+        window.localStorage.setItem('accessToken', response.data.accessToken)
         router.push("/home");
       }
     } catch (error) {
