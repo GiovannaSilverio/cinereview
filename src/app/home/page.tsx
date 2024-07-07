@@ -36,9 +36,11 @@ export default function Home() {
 
 
     const [openModal, setOpenModal] = useState(false);
+    const [hoverFilme, setHoverFilme] = useState(false)
+    const [indexHoverFilme, setIndexHoverFilme] = useState<number>()
 
-    const userid = window.localStorage.getItem("userId");
-    const accessToken = window.localStorage.getItem("accessToken");
+    const userid = localStorage.getItem("userId");
+    const accessToken = localStorage.getItem("accessToken");
 
     if (!accessToken || !userid) {
         console.error("Usuário não autenticado");
@@ -111,9 +113,19 @@ export default function Home() {
                     {movies.map((movie, index) => {
                             if (!movie.adult) {
                                 return (
-                                    <div key={index} className="relative">
-                                        <div className="rounded-lg flex overflow-hidden hover:scale-110 justify-center items-center">
-                                            <button className="text-yellow font-bold text-2xl absolute z-20 font-jura text-center">Adicionar<br/>resenha</button>
+                                    <div 
+                                        onMouseEnter={() => { setHoverFilme(true); setIndexHoverFilme(index)} } 
+                                        onMouseLeave={() => { setHoverFilme(false); setIndexHoverFilme(-1)} } 
+                                        key={index} 
+                                        className="relative hover:scale-110"
+                                    >
+                                        <div className="rounded-lg flex overflow-hidden justify-center items-center">
+                                            <button 
+                                                onClick={() => setOpenModal(true)}
+                                                className={`${hoverFilme && indexHoverFilme === index ? "text-yellow" : "text-transparent"} font-bold text-2xl z-20 absolute font-jura text-center`}
+                                            >
+                                                Adicionar<br/>resenha
+                                            </button>
                                             <Image
                                                 className="object-cover"
                                                 alt="poster de filme"
