@@ -1,15 +1,19 @@
 "use client"
 import Star from "./Star";
 import { act, useState } from "react";
+import Image from "next/image";
 
 interface ModalAvaliarProps{
     onCloseModal: (estado: boolean) => void;
+    filme: any
 }
 
 const stars=[1,2,3,4,5];
 
-export default function ModalAvaliar({onCloseModal} : ModalAvaliarProps) {
+export default function ModalAvaliar({onCloseModal, filme} : ModalAvaliarProps) {
     const [activeIndex,setActiveIndex] = useState<number>();
+    console.log(filme);
+    
     const handleCloseModal = () => {
         onCloseModal(false)
       }
@@ -18,12 +22,20 @@ export default function ModalAvaliar({onCloseModal} : ModalAvaliarProps) {
 
     }
     return(
-        <div className="absolute bg-gray rounded-md text-white font-jura px-16 py-11 ">
+        <div className="absolute z-50 bg-gray rounded-md text-white font-jura px-16 py-11 ">
             <div className="flex justify-end w-full">
                 <button onClick={handleCloseModal} className="text-2xl">X</button>
             </div>
-            <div className="flex flex-row">
-                <div></div>
+            <div className="flex flex-row gap-10">
+                <div >
+                    <Image 
+                        src={`https://image.tmdb.org/t/p/original${filme.poster_path}`}
+                        width={300}
+                        height={450}
+                        alt="filme avaliado"
+                        className="rounded-md"
+                    />
+                </div>
                 <div className="flex gap-3 flex-col">
                     <h3>O que você achou desse filme?</h3>
                     <div className="flex gap-3 ">

@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/services/api";
 import Image from "next/image";
+// import { cookies } from "next/headers";
 import ModalAvaliar from "@/components/ModalAvaliar";
 
 interface RootObject {
@@ -33,14 +34,17 @@ interface Movie {
 export default function Home() {
     const [movies, setMovies] = useState<Movie[]>([]);
     const router = useRouter();
-
+    // const cookiesStorage = cookies();
 
     const [openModal, setOpenModal] = useState(false);
     const [hoverFilme, setHoverFilme] = useState(false)
+    const [filmeAtual, setFilmeAtual] = useState<Movie>();
     const [indexHoverFilme, setIndexHoverFilme] = useState<number>()
+    const [pesquisa, setPesquisa] = useState("");
 
     const userid = localStorage.getItem("userId");
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken  = localStorage.getItem("accessToken");
+
 
     if (!accessToken || !userid) {
         console.error("Usuário não autenticado");
@@ -77,13 +81,46 @@ export default function Home() {
         getMovies();
     }, []);
 
+    // useEffect(() => {
+    //     async function searchMovies() {
+    //         try {
+    //             const response = await api.get(`/search/page/1?query=${pesquisa}`, config)
+
+    //             const data = response.data as RootObject
+    //             setMovies(data.results)
+    //         } catch (error) {
+    //             if (error.response && error.response.status === 403) {
+    //                 console.error("Usuário não autenticado");
+    //                 router.push("/login");
+    //             } else {
+    //                 console.error("Erro na requisição:", error);
+    //             }
+    //         }
+    //     }
+
+    //     searchMovies(); 
+
+    // },[pesquisa])
+
+    const listaFiltrada = movies.filter((movie) => {
+        return movie.title
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .includes(pesquisa.toLowerCase());
+    });
+
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const newSearch = event.target.value;
+        
+        setPesquisa(newSearch)
+    };
+
     return (
         <>
             <Header />
             <div className="relative">
-                {openModal && (
-                    <div className="bg-[#0a2a50] w-full h-screen absolute bg-opacity-45 top-0 left-0 z-10" />
-                )}
+
                 <section className="bg-hero-pipoca w-full h-[710px] bg-no-repeat bg-cover flex flex-col justify-center items-center gap-28">
                     <h2 className="text-white text-center font-heavitas text-3xl">
                         Tenha organizado todas as <br />
@@ -94,6 +131,7 @@ export default function Home() {
                             placeholder="Pesquise seu filme"
                             className="placeholder-black flex-1 bg-lightgray placeholder-opacity-50 text-black focus:border-none focus:outline-none"
                             type="text"
+                            onChange={handleInputChange}
                         />
                         <button>
                             <Image
@@ -110,21 +148,22 @@ export default function Home() {
                         QUE TAL ASSISTIR?
                     </h2>
                     <div className="grid grid-cols-4 gap-20">
-                    {movies.map((movie, index) => {
+                    {listaFiltrada.map((movie, index) => {
                             if (!movie.adult) {
                                 return (
                                     <div 
                                         onMouseEnter={() => { setHoverFilme(true); setIndexHoverFilme(index)} } 
                                         onMouseLeave={() => { setHoverFilme(false); setIndexHoverFilme(-1)} } 
+                                        onClick={() => {setOpenModal(true); setFilmeAtual(movie)}}
+                                        
                                         key={index} 
                                         className="relative hover:scale-110"
                                     >
                                         <div className="rounded-lg flex overflow-hidden justify-center items-center">
                                             <button 
-                                                onClick={() => setOpenModal(true)}
-                                                className={`${hoverFilme && indexHoverFilme === index ? "text-yellow" : "text-transparent"} font-bold text-2xl z-20 absolute font-jura text-center`}
+                                                className={`${hoverFilme && indexHoverFilme === index ? "text-yellow" : "text-transparent"} font-bold text-2xl z-20 w-full h-full font-jura text-center inset-0 bg-black opacity-0 hover:opacity-75 transition-opacity absolute break-words`}
                                             >
-                                                Adicionar<br/>resenha
+                                                Adicionar resenha
                                             </button>
                                             <Image
                                                 className="object-cover"
@@ -134,7 +173,7 @@ export default function Home() {
                                                 height={350}
                                             />
                                         </div>
-                                        <div className="absolute inset-0 z-10 bg-black opacity-0 hover:opacity-75 transition-opacity"></div>
+                                        {/* <div className="absolute inset-0 z-10 bg-black opacity-0 hover:opacity-75 transition-opacity"></div> */}
                                     </div>
                                 );
                         
@@ -143,6 +182,7 @@ export default function Home() {
                     </div>
                     {openModal && (
                         <ModalAvaliar
+                            filme={filmeAtual}
                             onCloseModal={(estado) => setOpenModal(estado)}
                         />
                     )}

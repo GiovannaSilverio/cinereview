@@ -26,6 +26,7 @@ export default function Login() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
   const router = useRouter();
+  // const cookiesStorage = cookies();
 
   const onSubmit = async (data: any) => {
     try {
@@ -39,8 +40,8 @@ export default function Login() {
       if (response.status === 200) {
         alert("Login realizado com sucesso!");
 
-        window.localStorage.setItem('userId', response.data.userId)
-        window.localStorage.setItem('accessToken', response.data.accessToken)
+        localStorage.setItem('userId', response.data.userId)
+        localStorage.setItem('accessToken', response.data.accessToken)
         router.push("/home");
       }
     } catch (error) {
