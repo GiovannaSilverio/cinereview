@@ -1,6 +1,6 @@
 // esse componente precisa ser server side porque precisa ler o cookie de autenticação e fazer a requisição para o backend
-
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { cookies } from "next/headers";
 import { jwtDecode, JwtPayload } from "jwt-decode";
@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import Avaliacao from "@/components/Avaliacao";
 
 import api from "@/services/api";
+import { useRouter } from "next/navigation";
 
 interface JwtPayloadNew extends JwtPayload{
   
@@ -29,73 +30,58 @@ interface responseUser {
 }
 
 
-export const decodeToken = (token: string) => {
-  try {
-    // console.log("Token:", token);
-    const decodedToken = jwtDecode(token);
-    return decodedToken;
-  } catch (error) {
-    console.log("Erro ao decodificar o token:", error);
-  }
-
-}
-
-export default async function Perfil() {
-  const cookiesStorage = cookies();
-  const token  = cookiesStorage.get("accessToken");
-
-  if (!token) {
-    console.error("Usuário não autenticado");
-    redirect("/login");
-  }
-  // console.log("Access Token:", token); // Adicione este log para verificar se o token está sendo lido
-  // console.log("Token:", token.value);
-  const decodedToken = decodeToken(token.value) as JwtPayloadNew;
-
-  if (!decodedToken) {
-    console.error("Erro ao decodificar o token");
-    redirect("/login");
-  }
-
-try{
-  const response = await api.get(`/user/${decodedToken.user.id}`, {
-    withCredentials: true,
-  })
-
-  const data = response.data as responseUser;
-  console.log("Data:", data);
-
-  console.log("Response:", response.status);
-  console.log("Response:", response.data);
-
-  if (response.status === 403) {
-    console.error("Usuário não autenticado");
-    redirect("/login");
-  }
 
 
-}
+export default function Perfil() {
+
+  const router = useRouter();
+
+  const [usuario, setUsuario] = useState<responseUser>();
+
+  useEffect(() => {
+
+    const userid = window.localStorage.getItem('userId')
+    const accessToken = window.localStorage.getItem('accessToken')
 
 
-catch (error) {
-  console.log("Erro na requisição:", error);
+    if (!accessToken || !userid) {
+      console.error("Usuário não autenticado");
+      router.push("/login");
+    }
 
-}
- 
-  
-  // async function getUSer() {  
-  //   api.get(`/user/${decodedToken.user.id}`, {
-  //     withCredentials: true,
-  //   }).then((response) => {
-  //     console.log(response.data);
-  //     console.log(response.status);
-  //   }).catch((error) => {
-  //     console.log("Erro na requisição:", error);
-  //   });
-    
-  // }
 
-  // getUSer();
+
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken
+      }
+    }
+    async function getMovies() {
+      try {
+        const response = await api.get("/user/" + userid, config);
+
+        const data = response.data as any;
+        console.log("Data:", data);
+        setUsuario(data);
+
+        if (response.status === 403 || response.status === 401) {
+          console.error("Usuário não autenticado");
+          router.push("/login");
+        }
+
+      } catch (error: any) {
+        if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+          console.error("Usuário não autenticado");
+          router.push("/login");
+
+        } else {
+          console.error("Erro na requisição:", error);
+        }
+      }
+    }
+
+    getMovies();
+  }, []);
 
 
     return(
@@ -121,7 +107,9 @@ catch (error) {
                     <h3 className="text-white text-2xl font-jura">Favoritos</h3>
                 </section>
                 <section className="flex flex-col justify-center items-center">
-                    <Avaliacao/>
+                  {usuario?.reviews.map((review, index) => 
+                    <Avaliacao key={index} review={review}/>
+                  )}
                 </section>
             </div>
             <Footer/>       

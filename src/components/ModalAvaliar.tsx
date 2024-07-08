@@ -2,6 +2,7 @@
 import Star from "./Star";
 import { act, useState } from "react";
 import Image from "next/image";
+import api from "@/services/api";
 
 interface ModalAvaliarProps{
     onCloseModal: (estado: boolean) => void;
@@ -12,14 +13,43 @@ const stars=[1,2,3,4,5];
 
 export default function ModalAvaliar({onCloseModal, filme} : ModalAvaliarProps) {
     const [activeIndex,setActiveIndex] = useState<number>();
-    console.log(filme);
+    const [textoAvaliacao, setTextoAvaliacao] = useState ("");
+
+    const userId = window.localStorage.getItem('userId')
+    const accessToken = window.localStorage.getItem('accessToken')
+
+    const config = {
+        headers: {
+            Authorization: "Bearer " + accessToken,
+        },
+    };
     
     const handleCloseModal = () => {
         onCloseModal(false)
-      }
+    }
+
     const onClickStar = ( star : number) =>{
         setActiveIndex(star);
 
+    }
+
+    //mandando dados para o backend
+    const handleSubmit = async () => {
+        const avaliacao = {
+            ...filme,
+            movieId: filme.id,
+            content: textoAvaliacao,
+            rating: activeIndex,
+            userId: userId
+        }
+        console.log(avaliacao);
+        
+        const response = await api.post("/review/create", avaliacao, config)
+        if(response.status === 200)
+            handleCloseModal()
+        else
+            console.log(response);
+            
     }
     return(
         <div className="absolute z-50 bg-gray rounded-md text-white font-jura px-16 py-11 ">
@@ -44,10 +74,10 @@ export default function ModalAvaliar({onCloseModal, filme} : ModalAvaliarProps) 
                         })}
                     </div>
                     <h3>Deixe um comentário sobre a obra:</h3>
-                    <textarea className="text-black bg-[#666666] font-bold h-48 rounded-md"></textarea>
+                    <textarea onBlur={(ev) => setTextoAvaliacao(ev.target.value)} className="text-black bg-[#666666] font-bold h-48 rounded-md"></textarea>
                     <div className="flex gap-5">
                         <button className="bg-white hover:bg-[#C2C1BF] w-fit text-black font-bold px-8 py-1 rounded-md">Favoritar</button>
-                        <button className="bg-yellow hover:bg-[#D0A31C] w-fit text-black font-bold px-8 py-1 rounded-md">Salvar</button>
+                        <button onClick={() => handleSubmit()} className="bg-yellow hover:bg-[#D0A31C] w-fit text-black font-bold px-8 py-1 rounded-md">Salvar</button>
                     </div>
                     
                 </div>

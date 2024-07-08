@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 type Props = {
-    isActive: boolean;
-    onClick(): void;
+    isActive?: boolean;
+    onClick?: () => void;
 }
 
 
