@@ -58,7 +58,6 @@ export default function ModalAvaliar({onCloseModal, filme} : ModalAvaliarProps) 
             movieId: filme.id,
             userId: userId
         }
-        
         const response = await api.put("/user/add/favorites", favorito, config);
         if(response.status === 200)
             handleCloseModal()

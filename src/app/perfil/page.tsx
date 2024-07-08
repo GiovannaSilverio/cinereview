@@ -1,4 +1,3 @@
-// esse componente precisa ser server side porque precisa ler o cookie de autenticação e fazer a requisição para o backend
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -9,6 +8,8 @@ import Avaliacao from "@/components/Avaliacao";
 
 import api from "@/services/api";
 import { useRouter } from "next/navigation";
+import ModalAvaliar from "@/components/ModalAvaliar";
+import ModalEditar from "@/components/ModalEditar";
 
 interface Movie {
   adult: boolean;
@@ -35,10 +36,19 @@ interface responseUser {
     reviews: [];
 }
 
+interface Review {
+  id: number;
+  content: string;
+  rating: number;
+  movie: Movie;
+}
+
+
 export default function Perfil() {
     const router = useRouter();
-
+    const [openModal, setOpenModal] = useState(false);
     const [usuario, setUsuario] = useState<responseUser>();
+    const [selectedReview, setSelectedReview] = useState<Review>();
     const userId = window.localStorage.getItem("userId");
     const accessToken = window.localStorage.getItem("accessToken");
 
@@ -110,7 +120,7 @@ export default function Perfil() {
                             return (
                                 <Image
                                     key={index}
-                                    className="object-cover rounded-md"
+                                    className="object-cover rounded-md hover:scale-105"
                                     alt="poster de filme"
                                     src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
                                     width={238}
@@ -123,8 +133,9 @@ export default function Perfil() {
                 </section>
                 <section className="flex flex-col justify-center gap-5 w-3/4 items-center">
                     {usuario?.reviews.map((review, index) => (
-                        <Avaliacao key={index} review={review} />
+                       <Avaliacao onOpenModal={(estado, review) => { setOpenModal(estado); setSelectedReview(review); }} key={index} review={review} />
                     ))}
+                    {openModal && selectedReview && <ModalEditar modalIsOpen={openModal} onCloseModal={setOpenModal} review={selectedReview}/>}
                 </section>
             </div>
             <Footer />

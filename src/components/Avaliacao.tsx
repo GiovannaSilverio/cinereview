@@ -32,9 +32,10 @@ interface Review {
 
 interface AvaliacaoProps {
     review: Review;
+    onOpenModal: (estado: boolean, review: Review) => void
 }
 
-export default function Avaliacao({review} : AvaliacaoProps) {
+export default function Avaliacao({onOpenModal, review} : AvaliacaoProps) {
     const userId = window.localStorage.getItem("userId");
     const accessToken = window.localStorage.getItem("accessToken");
     const config = {
@@ -52,11 +53,17 @@ export default function Avaliacao({review} : AvaliacaoProps) {
         }
     };
 
+    const handleEdit = ()=>{
+        onOpenModal(true, review)
+    }
+
     
     return (
-        <div className="bg-gray rounded-md flex flex-col px-20 py-10 gap-10 h-fit w-full">
+        <div className="bg-gray rounded-md flex flex-col px-20 py-8 gap-5 h-fit w-full">
             <div className="flex justify-end gap-4 ">
-                <button>
+                <button
+                    onClick={handleEdit}
+                >
                     <Image src="/img/edit.png" width={30} height={30} alt="botao de edição de avaliacao"/>
                 </button>
                 <button
@@ -65,7 +72,7 @@ export default function Avaliacao({review} : AvaliacaoProps) {
                     <Image src="/img/delete.png" width={30} height={30} alt="botao de exclusao de avaliacao"/>
                 </button>
             </div>
-            <div className="flex flex-row px-20 py-10 gap-10 h-fit w-3/4">
+            <div className="flex flex-row px-20 py-10 gap-10 h-fit w-full">
                 <Image
                     className="rounded-md"
                     src={`https://image.tmdb.org/t/p/original${review.movie.poster_path}`}
