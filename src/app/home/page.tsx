@@ -5,7 +5,6 @@ import Footer from "@/components/Footer";
 import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/services/api";
 import Image from "next/image";
-// import { cookies } from "next/headers";
 import ModalAvaliar from "@/components/ModalAvaliar";
 
 interface RootObject {
@@ -31,10 +30,13 @@ interface Movie {
     vote_count: number;
 }
 
+let userid = null
+let accessToken = null
+
 export default function Home() {
     const [movies, setMovies] = useState<Movie[]>([]);
     const router = useRouter();
-    // const cookiesStorage = cookies();
+
 
     const [openModal, setOpenModal] = useState(false);
     const [hoverFilme, setHoverFilme] = useState(false)
@@ -42,79 +44,87 @@ export default function Home() {
     const [indexHoverFilme, setIndexHoverFilme] = useState<number>()
     const [pesquisa, setPesquisa] = useState("");
 
-    const userid = localStorage.getItem("userId");
-    const accessToken  = localStorage.getItem("accessToken");
 
 
-    if (!accessToken || !userid) {
-        console.error("Usuário não autenticado");
-        router.push("/login");
-    }
+    async function getMovies() {
+        userid = localStorage.getItem("userId");
+        accessToken = localStorage.getItem("accessToken");
+        const config = {
+            headers: {
+                Authorization: "Bearer " + accessToken,
+            },
+        };
+        try {
+            const response = await api.get(
+                `/movies/page/1`,
+                config
+            );
 
-    const config = {
-        headers: {
-            Authorization: "Bearer " + accessToken,
-        },
-    };
-
-    useEffect(() => {
-        async function getMovies() {
-            try {
-                const response = await api.get(
-                    `/movies/page/1`,
-                    config
-                );
-
-                const data = response.data as RootObject;
-                setMovies(data.results);
-                console.log("Data:", data);
-            } catch (error: any) {
-                if (error.response && error.response.status === 403) {
-                    console.error("Usuário não autenticado");
-                    router.push("/login");
-                } else {
-                    console.error("Erro na requisição:", error);
-                }
+            const data = response.data as RootObject;
+            setMovies(data.results);
+            console.log("Data:", data);
+        } catch (error: any) {
+            if (error.response && error.response.status === 403) {
+                console.error("Usuário não autenticado");
+                router.push("/login");
+            } else {
+                console.error("Erro na requisição:", error);
             }
         }
+    }
+
+    useEffect(() => {
 
         getMovies();
+
     }, []);
 
-    // useEffect(() => {
-    //     async function searchMovies() {
-    //         try {
-    //             const response = await api.get(`/search/page/1?query=${pesquisa}`, config)
-
-    //             const data = response.data as RootObject
-    //             setMovies(data.results)
-    //         } catch (error) {
-    //             if (error.response && error.response.status === 403) {
-    //                 console.error("Usuário não autenticado");
-    //                 router.push("/login");
-    //             } else {
-    //                 console.error("Erro na requisição:", error);
-    //             }
-    //         }
-    //     }
-
-    //     searchMovies(); 
-
-    // },[pesquisa])
-
-    const listaFiltrada = movies.filter((movie) => {
-        return movie.title
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toLowerCase()
-            .includes(pesquisa.toLowerCase());
-    });
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const newSearch = event.target.value;
-        
-        setPesquisa(newSearch)
+
+        setPesquisa(event.target.value);
+
     };
+
+    async function handleSearch() {
+        userid = localStorage.getItem("userId");
+        accessToken = localStorage.getItem("accessToken");
+
+
+        if (!accessToken || !userid) {
+            console.error("Usuário não autenticado");
+            router.push("/login");
+        }
+
+        const config = {
+            headers: {
+                Authorization: "Bearer " + accessToken,
+            },
+        };
+
+        if (pesquisa === "") {
+            getMovies();
+            return
+        }
+
+        try {
+            const response = await api.get(
+                `/movies/search/page/1?query=${pesquisa}`,
+                config
+            );
+
+            const data = response.data as RootObject;
+            setMovies(data.results);
+            console.log("Data:", data);
+        } catch (error: any) {
+            if (error.response && error.response.status === 403) {
+                console.error("Usuário não autenticado");
+                router.push("/login");
+            } else {
+                console.error("Erro na requisição:", error);
+            }
+        }
+    }
 
     return (
         <>
@@ -132,8 +142,9 @@ export default function Home() {
                             className="placeholder-black flex-1 bg-lightgray placeholder-opacity-50 text-black focus:border-none focus:outline-none"
                             type="text"
                             onChange={handleInputChange}
+
                         />
-                        <button>
+                        <button onClick={handleSearch}>
                             <Image
                                 src="/img/search.png"
                                 alt="lupa"
@@ -148,19 +159,23 @@ export default function Home() {
                         QUE TAL ASSISTIR?
                     </h2>
                     <div className="grid grid-cols-4 gap-20">
-                    {listaFiltrada.map((movie, index) => {
+                        {movies.map((movie, index) => {
+                            if (!movie.poster_path) {
+                                return;
+                            }
+
                             if (!movie.adult) {
                                 return (
-                                    <div 
-                                        onMouseEnter={() => { setHoverFilme(true); setIndexHoverFilme(index)} } 
-                                        onMouseLeave={() => { setHoverFilme(false); setIndexHoverFilme(-1)} } 
-                                        onClick={() => {setOpenModal(true); setFilmeAtual(movie)}}
-                                        
-                                        key={index} 
+                                    <div
+                                        onMouseEnter={() => { setHoverFilme(true); setIndexHoverFilme(index) }}
+                                        onMouseLeave={() => { setHoverFilme(false); setIndexHoverFilme(-1) }}
+                                        onClick={() => { setOpenModal(true); setFilmeAtual(movie) }}
+
+                                        key={index}
                                         className="relative hover:scale-110"
                                     >
                                         <div className="rounded-lg flex overflow-hidden justify-center items-center">
-                                            <button 
+                                            <button
                                                 className={`${hoverFilme && indexHoverFilme === index ? "text-yellow" : "text-transparent"} font-bold text-2xl z-20 w-full h-full font-jura text-center inset-0 bg-black opacity-0 hover:opacity-75 transition-opacity absolute break-words`}
                                             >
                                                 Adicionar resenha
@@ -176,15 +191,17 @@ export default function Home() {
                                         {/* <div className="absolute inset-0 z-10 bg-black opacity-0 hover:opacity-75 transition-opacity"></div> */}
                                     </div>
                                 );
-                        
+
                             }
                         })}
                     </div>
                     {openModal && (
+
                         <ModalAvaliar
                             filme={filmeAtual}
                             onCloseModal={(estado) => setOpenModal(estado)}
                         />
+
                     )}
                 </section>
             </div>
