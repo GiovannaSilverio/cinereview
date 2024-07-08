@@ -10,11 +10,28 @@ import Avaliacao from "@/components/Avaliacao";
 import api from "@/services/api";
 import { useRouter } from "next/navigation";
 
+interface Movie {
+  adult: boolean;
+  backdrop_path: string;
+  genre_ids: number[];
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
+
 interface responseUser {
     id: number;
     username: string;
     email: string;
-    favoriteMovies: [];
+    favoriteMovies: Movie[];
     reviews: [];
 }
 
@@ -26,7 +43,6 @@ export default function Perfil() {
     const accessToken = window.localStorage.getItem("accessToken");
 
     useEffect(() => {
-
         if (!accessToken || !userId) {
             console.error("Usuário não autenticado");
             router.push("/login");
@@ -66,7 +82,6 @@ export default function Perfil() {
         getMovies();
     }, []);
 
-
     return (
         <>
             <Header />
@@ -80,20 +95,31 @@ export default function Perfil() {
                         width={237}
                         height={237}
                     />
-                    <p className="text-yellow text-3xl">USERNAME</p>
+                    <p className="text-yellow text-3xl">{usuario?.username}</p>
                     <div className="flex gap-24 text-center text-xl">
                         <div>
-                            <p>10</p>
-                            <p>Total</p>
-                        </div>
-                        <div>
-                            <p>3</p>
-                            <p>Esse mês</p>
+                            <p>{usuario?.reviews.length}</p>
+                            <p>Total de reviews</p>
                         </div>
                     </div>
                 </section>
                 <section className="bg-gray w-3/4 h-fit py-5 flex flex-col items-center rounded-md">
-                    <h3 className="text-white text-2xl font-jura">Favoritos</h3>
+                    <h3 className="text-white text-2xl font-bold font-jura">Favoritos</h3>
+                    <div className="flex gap-20 my-4">
+                        {usuario?.favoriteMovies.map((movie, index) => {
+                            return (
+                                <Image
+                                    key={index}
+                                    className="object-cover rounded-md"
+                                    alt="poster de filme"
+                                    src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+                                    width={238}
+                                    height={350}
+                                    
+                                />
+                            );
+                        })}
+                    </div>
                 </section>
                 <section className="flex flex-col justify-center gap-5 w-3/4 items-center">
                     {usuario?.reviews.map((review, index) => (

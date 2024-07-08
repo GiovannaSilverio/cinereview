@@ -37,6 +37,12 @@ interface AvaliacaoProps {
 export default function Avaliacao({review} : AvaliacaoProps) {
     const userId = window.localStorage.getItem("userId");
     const accessToken = window.localStorage.getItem("accessToken");
+    const config = {
+        headers: {
+            Authorization: "Bearer " + accessToken,
+        },
+    };
+
     const handleDelete = async () => {
         if(window.confirm("Deseja excluir a avaliação?")){
           const response = await api.delete(`/review/delete/${userId}/${review.id}`, config);
@@ -46,11 +52,7 @@ export default function Avaliacao({review} : AvaliacaoProps) {
         }
     };
 
-    const config = {
-        headers: {
-            Authorization: "Bearer " + accessToken,
-        },
-    };
+    
     return (
         <div className="bg-gray rounded-md flex flex-col px-20 py-10 gap-10 h-fit w-full">
             <div className="flex justify-end gap-4 ">

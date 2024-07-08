@@ -51,6 +51,20 @@ export default function ModalAvaliar({onCloseModal, filme} : ModalAvaliarProps) 
             console.log(response);
             
     }
+
+    const handleFavorite = async () => {
+        const favorito = {
+            ...filme,
+            movieId: filme.id,
+            userId: userId
+        }
+        
+        const response = await api.put("/user/add/favorites", favorito, config);
+        if(response.status === 200)
+            handleCloseModal()
+        else
+            console.log(response);
+    }
     return(
         <div className="absolute z-50 bg-gray rounded-md text-white font-jura px-16 py-11 ">
             <div className="flex justify-end w-full">
@@ -76,7 +90,7 @@ export default function ModalAvaliar({onCloseModal, filme} : ModalAvaliarProps) 
                     <h3>Deixe um comentário sobre a obra:</h3>
                     <textarea onBlur={(ev) => setTextoAvaliacao(ev.target.value)} className="text-black bg-[#666666] font-bold h-48 rounded-md"></textarea>
                     <div className="flex gap-5">
-                        <button className="bg-white hover:bg-[#C2C1BF] w-fit text-black font-bold px-8 py-1 rounded-md">Favoritar</button>
+                        <button onClick={() => handleFavorite()} className="bg-white hover:bg-[#C2C1BF] w-fit text-black font-bold px-8 py-1 rounded-md">Favoritar</button>
                         <button onClick={() => handleSubmit()} className="bg-yellow hover:bg-[#D0A31C] w-fit text-black font-bold px-8 py-1 rounded-md">Salvar</button>
                     </div>
                     
