@@ -19,10 +19,11 @@ const schema = object({
 })
 
 export default function Cadastro() {
-    const { register, handleSubmit, formState:{ errors } } = useForm({resolver: yupResolver(schema)});
+    const { register, handleSubmit, formState: { errors } } = useForm({ resolver: yupResolver(schema) });
     const router = useRouter();
 
     const onSubmit = async (data: any) => {
+
         try {
             const response = await api.post("/user/create", data, {
                 method: "POST",
@@ -30,19 +31,25 @@ export default function Cadastro() {
                     "Content-Type": "application/json"
                 }
             });
-            if(response.status === 200){
+
+            console.log(response.status);
+            if (response.status === 201) {
                 alert("Usuário cadastrado com sucesso!")
                 router.push("/login")
+            }
+
+            else {
+                alert("Erro ao cadastrar usuário!")
             }
         } catch (error) {
             console.log(error);
         }
-        
+
     };
 
     return (
         <div className="bg-black flex items-center justify-center h-full w-full font-jura">
-            <form 
+            <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="m-10 bg-gray flex flex-col w-2/5 px-8 py-12 rounded-lg items-center gap-3"
             >
@@ -117,7 +124,7 @@ export default function Cadastro() {
                         </span>
                     </p>
                     <button
-                        type="submit" 
+                        type="submit"
                         className="bg-red hover:bg-redhover font-heavitas text-white px-5 w-fit py-2 rounded-md">
                         CADASTRAR
                     </button>

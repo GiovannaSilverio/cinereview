@@ -24,7 +24,7 @@ interface Movie {
 }
 
 interface Review {
-    id: number;
+    id : string,
     rating : number;
     content: string;
     movie: Movie;
@@ -91,6 +91,9 @@ export default function Avaliacao({onOpenModal, review} : AvaliacaoProps) {
                         {review.content}
                     </p>
                 </div>
+                <p className="text-white">
+                    {review.content}
+                </p>
             </div>
         </div>
     );

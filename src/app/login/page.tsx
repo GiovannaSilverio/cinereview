@@ -66,7 +66,7 @@ export default function Login() {
             type="email"
           />
           <span className="text-white self-start">{errors?.email?.message}</span>
-          
+
           <label className="self-start font-heavitas text-white" htmlFor="password">
             SENHA
           </label>
