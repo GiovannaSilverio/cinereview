@@ -8,7 +8,7 @@ import api from "@/services/api";
 import { useRouter } from "next/navigation";
 import ModalAvaliar from "@/components/ModalAvaliar";
 import ModalEditar from "@/components/ModalEditar";
-import { Review, ResponseUser } from "@/interfaces/interface"
+import { Review, ResponseUser } from "@/interfaces/interface";
 
 export default function Perfil() {
     const router = useRouter();
@@ -98,6 +98,21 @@ export default function Perfil() {
                             <p>Esse mês</p>
                         </div>
                     </div>
+                    <div className="flex gap-10">
+                        <button
+                            onClick={() => router.push("/atualizar-email")}
+                            className="bg-red hover:bg-redhover text-white px-4 py-2 rounded"
+                        >
+                            Atualizar Email
+                        </button>
+
+                        <button
+                            onClick={() => router.push("/atualizar-senha")}
+                            className="bg-red hover:bg-redhover text-white px-4 py-2 rounded"
+                        >
+                            Atualizar Senha
+                        </button>
+                    </div>
                 </section>
                 <section className="bg-gray w-3/4 h-fit py-5 flex flex-col items-center rounded-md">
                     <h3 className="text-white text-2xl font-bold font-jura">
@@ -137,22 +152,6 @@ export default function Perfil() {
                         />
                     )}
                 </section>
-                <div>
-                    <button
-                        onClick={() => router.push("/atualizar-email")}
-                        className="bg-red text-white px-4 py-2 rounded"
-                    >
-                        Atualizar Email
-                    </button>
-                </div>
-                <div>
-                    <button
-                        onClick={() => router.push("/atualizar-senha")}
-                        className="bg-red text-white px-4 py-2 rounded"
-                    >
-                        Atualizar Senha
-                    </button>
-                </div>
             </div>
             <section className="flex flex-col items-center gap-4"></section>
             <Footer />

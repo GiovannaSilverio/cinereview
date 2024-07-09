@@ -9,13 +9,15 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 //yup
-import { object, string } from "yup"
+import { object, string, ref } from "yup"
 
 const schema = object({
     username: string().required("campo de nome obrigatório"),
     email: string().required("campo de email obrigatório"),
     password: string().required("campo de senha obrigatório").min(4, "Sua senha deve ter pelo menos 4 digitos"),
-    confirmarSenha: string().required("campo de confirmação obrigatório").min(4, "Sua senha deve ter pelo menos 4 digitos"),
+    confirmarSenha: string()
+        .required("campo de confirmação obrigatório")
+        .oneOf([ref('password')], "As senhas devem ser iguais")
 })
 
 export default function Cadastro() {

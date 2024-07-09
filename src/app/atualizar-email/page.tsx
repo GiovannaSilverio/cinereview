@@ -65,14 +65,14 @@ export default function AtualizarEmail() {
                         />
                         <button
                             type="submit"
-                            className="p-2 bg-blue-500 rounded hover:bg-blue-700"
+                            className="p-2 bg-red rounded-md hover:bg-redhover"
                         >
                             Atualizar Email
                         </button>
                     </form>
                     <button
                         onClick={() => router.push("/perfil")}
-                        className="p-2 bg-green-500 rounded hover:bg-green-700"
+                        className="p-2 bg-yellow rounded-md hover:bg-[#D0A31C]"
                     >
                         Ir para Perfil
                     </button>

@@ -68,14 +68,14 @@ export default function AtualizarSenha() {
                         />
                         <button
                             type="submit"
-                            className="p-2 bg-blue-500 rounded hover:bg-blue-700"
+                            className="p-2 font-bold bg-red rounded hover:bg-redhover"
                         >
                             Atualizar Senha
                         </button>
                     </form>
                     <button
                         onClick={() => router.push("/perfil")}
-                        className="p-2 bg-green-500 rounded hover:bg-green-700"
+                        className="p-2 font-bold bg-yellow rounded hover:bg-[#D0A31C]"
                     >
                         Ir para Perfil
                     </button>
