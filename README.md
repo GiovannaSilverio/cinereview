@@ -1,6 +1,6 @@
 # Cine Review
 
-<img src="/public/img/hero-cover.png" alt="Capa da página inicial"/>
+<img src="/public/img/herocover.png" alt="Capa da página inicial"/>
 
 ## Objetivo
 O projeto tem por objetivo facilitar a organização dos filmes assistidos por uma pessoa, fazendo com que ela possa avaliar
