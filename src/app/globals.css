@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 @font-face {
-    font-family: 'jura';
-    src: url("/fonts/JuraBook.ttf") format('truetype');
-  }
+  font-family: 'jura';
+  src: url("/fonts/JuraBook.ttf") format('truetype');
+}
 
-  @font-face {
-    font-family: 'heavitas';
-    src: url("/fonts/JuraBook.ttf") format('truetype');
-    
-  }
+@font-face {
+  font-family: 'heavitas';
+  src: url("/fonts/Heavitas.ttf") format('truetype');
+  
+}
