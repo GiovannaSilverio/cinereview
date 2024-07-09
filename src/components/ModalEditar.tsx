@@ -40,6 +40,7 @@ interface Review {
     content: string;
     rating: number;
     movie: Movie;
+    date?: Date;
 }
 
 const stars=[1,2,3,4,5];

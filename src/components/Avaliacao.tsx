@@ -3,32 +3,9 @@ import Image from "next/image";
 import Star from "./Star";
 import { number } from "yup";
 import api from "@/services/api";
+import { Review } from "@/interfaces/interface";
 
 const stars = [1, 2, 3, 4, 5];
-
-interface Movie {
-    adult: boolean;
-    backdrop_path: string;
-    genre_ids: number[];
-    id: number;
-    original_language: string;
-    original_title: string;
-    overview: string;
-    popularity: number;
-    poster_path: string;
-    release_date: string;
-    title: string;
-    video: boolean;
-    vote_average: number;
-    vote_count: number;
-}
-
-interface Review {
-    id : string,
-    rating : number;
-    content: string;
-    movie: Movie;
-}
 
 interface AvaliacaoProps {
     review: Review;
@@ -56,7 +33,6 @@ export default function Avaliacao({onOpenModal, review} : AvaliacaoProps) {
     const handleEdit = ()=>{
         onOpenModal(true, review)
     }
-
     
     return (
         <div className="bg-gray rounded-md flex flex-col px-20 py-8 gap-5 h-fit w-full">
@@ -91,9 +67,6 @@ export default function Avaliacao({onOpenModal, review} : AvaliacaoProps) {
                         {review.content}
                     </p>
                 </div>
-                <p className="text-white">
-                    {review.content}
-                </p>
             </div>
         </div>
     );
